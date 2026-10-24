@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { formatEther, isAddress, parseEther, type Address, type Hex } from "viem";
+import { formatEther, isAddress, parseEther, parseEventLogs, type Address, type Hex } from "viem";
 import { useAccount, useChainId, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import Button from "@/components/ui/Button";
 import { tabAbi } from "@/lib/botchain/abi";
@@ -61,15 +61,17 @@ export default function NewEntryForm({ initialTo = "" }: NewEntryFormProps) {
 
       // Extract proposal id from Proposed event in receipt
       if (receipt?.logs) {
-        for (const log of receipt.logs) {
-          try {
-            if (log.topics[1]) {
-              setCreatedId(BigInt(log.topics[1]));
-              break;
-            }
-          } catch {
-            // ignore parse error
+        try {
+          const parsed = parseEventLogs({
+            abi: tabAbi,
+            logs: receipt.logs,
+            eventName: "Proposed",
+          });
+          if (parsed.length > 0 && parsed[0]?.args?.id !== undefined) {
+            setCreatedId(parsed[0].args.id);
           }
+        } catch {
+          // ignore parse error
         }
       }
     } else if (isReceiptError && settledHash.current !== hash) {

@@ -157,6 +157,8 @@ export function describeError(err: unknown): string {
         return "Nothing to collect.";
       case "TransferFailed":
         return "BOT transfer failed.";
+      case "Reentrancy":
+        return "Reentrant call detected.";
       default:
         return `Contract error: ${rev.errorName}`;
     }

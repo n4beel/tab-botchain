@@ -22,6 +22,29 @@ contract HostileReceiver {
     }
 }
 
+contract ReentrantWithdrawer {
+    Tab public tab;
+    bool public reentrancyReverted;
+
+    constructor(Tab _tab) {
+        tab = _tab;
+    }
+
+    receive() external payable {
+        try tab.withdraw() {
+        } catch (bytes memory reason) {
+            // forge-lint: disable-next-line(unsafe-typecast)
+            if (bytes4(reason) == Tab.Reentrancy.selector) {
+                reentrancyReverted = true;
+            }
+        }
+    }
+
+    function triggerWithdraw() external {
+        tab.withdraw();
+    }
+}
+
 contract TabHandler is CommonBase, StdCheats, StdUtils {
     Tab public tab;
     address[] public actors;
@@ -573,5 +596,22 @@ contract TabTest is Test {
         tab.withdraw();
         uint256 gasWithdraw = g0 - gasleft();
         assertLt(gasWithdraw, 65_000);
+    }
+
+    function test_Reentrancy_RevertsWithCustomError() public {
+        ReentrantWithdrawer attacker = new ReentrantWithdrawer(tab);
+        vm.prank(alice);
+        uint256 id = tab.propose(address(attacker), false, 1 ether, "Reentrancy test");
+        vm.prank(address(attacker));
+        tab.confirm(id);
+
+        vm.deal(alice, 2 ether);
+        vm.prank(alice);
+        tab.settle{value: 1 ether}(address(attacker));
+
+        assertEq(tab.pending(address(attacker)), 1 ether);
+
+        attacker.triggerWithdraw();
+        assertTrue(attacker.reentrancyReverted());
     }
 }

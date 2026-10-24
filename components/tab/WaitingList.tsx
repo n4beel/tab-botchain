@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { formatEther, type Address, type Hex } from "viem";
-import { useAccount, useChainId, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useChainId, usePublicClient, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import Button from "@/components/ui/Button";
 import { tabAbi } from "@/lib/botchain/abi";
 import { isBotChainId } from "@/lib/botchain/chain";
@@ -17,8 +17,13 @@ export default function WaitingList() {
     ? (getDeployment(chainId)?.address as Address | undefined)
     : undefined;
 
+  const publicClient = usePublicClient();
+  const publicClientRef = useRef(publicClient);
+  publicClientRef.current = publicClient;
+
   const [activeTxId, setActiveTxId] = useState<bigint | null>(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const [notes, setNotes] = useState<Record<string, string>>({});
 
   // Read proposals
   const { data: proposalsData, refetch } = useReadContract({
@@ -51,6 +56,44 @@ export default function WaitingList() {
   }, [hash, isReceiptSuccess, refetch]);
 
   const proposals = proposalsData || [];
+
+  // Query notes from Proposed event logs at createdBlock
+  useEffect(() => {
+    if (!contractAddress || !publicClientRef.current || proposals.length === 0) return;
+    let cancelled = false;
+
+    async function loadNotes() {
+      const client = publicClientRef.current;
+      if (!client) return;
+      const newNotes: Record<string, string> = {};
+      const pendingProps = proposals.filter((p) => p.state === 0);
+      for (const p of pendingProps) {
+        try {
+          const logs = await client.getContractEvents({
+            address: contractAddress!,
+            abi: tabAbi,
+            eventName: "Proposed",
+            fromBlock: BigInt(p.createdBlock),
+            toBlock: BigInt(p.createdBlock),
+          });
+          const match = logs.find((l) => (l.args as any)?.id === p.id);
+          if (match && (match.args as any)?.note) {
+            newNotes[p.id.toString()] = (match.args as any).note;
+          }
+        } catch {
+          // ignore
+        }
+      }
+      if (!cancelled) {
+        setNotes((prev) => ({ ...prev, ...newNotes }));
+      }
+    }
+
+    loadNotes();
+    return () => {
+      cancelled = true;
+    };
+  }, [contractAddress, proposals]);
 
   // Filter pending proposals
   const pendingInbound = proposals.filter(
@@ -165,6 +208,11 @@ export default function WaitingList() {
                     <p className="text-xs text-[#7A5646] mt-1">
                       From: <Link href={`/with/${p.proposer}`} className="underline text-[#3A1F14]">{shortAddress(p.proposer)}</Link>
                     </p>
+                    {notes[p.id.toString()] && (
+                      <p className="text-xs text-[#3A1F14] italic mt-1.5 bg-[#FFF6EE] px-2 py-1 border-l-2 border-[#B8371F] rounded-[1px]">
+                        &ldquo;{notes[p.id.toString()]}&rdquo;
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
@@ -224,8 +272,13 @@ export default function WaitingList() {
                       </span>
                     </div>
                     <p className="text-xs text-[#7A5646] mt-1">
-                      Proposal #{p.id.toString()}
+                      To: <Link href={`/with/${p.other}`} className="underline text-[#3A1F14]">{shortAddress(p.other)}</Link> · Proposal #{p.id.toString()}
                     </p>
+                    {notes[p.id.toString()] && (
+                      <p className="text-xs text-[#3A1F14] italic mt-1.5 bg-[#FFF6EE] px-2 py-1 border-l-2 border-[#7A5646] rounded-[1px]">
+                        &ldquo;{notes[p.id.toString()]}&rdquo;
+                      </p>
+                    )}
                   </div>
 
                   <div className="shrink-0">

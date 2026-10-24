@@ -44,7 +44,7 @@ export default function PageShell({
   const sub = subtitle || description;
 
   return (
-    <div className="min-h-[100dvh] bg-[#FFE3D3] text-[#3A1F14] flex flex-col justify-between p-3 sm:p-6 md:p-8">
+    <div className="min-h-[100dvh] bg-[#FFE3D3] text-[#3A1F14] flex flex-col justify-between p-3 sm:p-6 lg:p-8 lg:pr-14 pb-16 lg:pb-8">
       {/* Book Frame */}
       <div className="mx-auto w-full max-w-[1240px] flex-1 flex flex-col relative">
         {/* Ledger Header Bar / Spine Folio */}
@@ -65,7 +65,7 @@ export default function PageShell({
             {backHref && (
               <Link
                 href={backHref}
-                className="md:hidden inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#B8371F] bg-[#FFF6EE] border border-[#E8C9B8] px-2.5 py-1 rounded-[2px]"
+                className="lg:hidden inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#B8371F] bg-[#FFF6EE] border border-[#E8C9B8] px-2.5 py-1 rounded-[2px]"
               >
                 ← {backLabel}
               </Link>
@@ -73,7 +73,7 @@ export default function PageShell({
             {!backHref && !isHome && (
               <Link
                 href="/"
-                className="md:hidden inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#B8371F] bg-[#FFF6EE] border border-[#E8C9B8] px-2.5 py-1 rounded-[2px]"
+                className="lg:hidden inline-flex items-center gap-1 text-xs font-mono font-semibold text-[#B8371F] bg-[#FFF6EE] border border-[#E8C9B8] px-2.5 py-1 rounded-[2px]"
               >
                 ← Ledger
               </Link>
@@ -87,11 +87,11 @@ export default function PageShell({
         </header>
 
         {/* Ledger Book Spread Container */}
-        <div className="relative flex-1 flex flex-col md:flex-row bg-[#FFF6EE] border border-[#E8C9B8] rounded-[4px] shadow-[0_10px_35px_rgba(58,31,20,0.12)] overflow-visible">
-          {/* Bookmark Tabs protruding on the Right Edge (Desktop & Tablet) */}
+        <div className="relative flex-1 flex flex-col lg:flex-row bg-[#FFF6EE] border border-[#E8C9B8] rounded-[4px] shadow-[0_10px_35px_rgba(58,31,20,0.12)] overflow-visible">
+          {/* Bookmark Tabs protruding on the Right Edge (Desktop spread >= 1024px) */}
           <nav
             aria-label="Ledger Bookmarks"
-            className="absolute -right-3 md:-right-8 top-12 z-20 hidden sm:flex flex-col gap-2"
+            className="absolute -right-3 lg:-right-8 top-12 z-20 hidden lg:flex flex-col gap-2"
           >
             {nav.map((item) => {
               const active =
@@ -108,9 +108,7 @@ export default function PageShell({
                       : "bg-[#FFF6EE] text-[#3A1F14] border-[#E8C9B8] hover:bg-[#FBEBE8] hover:text-[#B8371F]",
                   ].join(" ")}
                 >
-                  <span className="writing-mode-vertical sm:writing-mode-horizontal">
-                    {item.label}
-                  </span>
+                  <span>{item.label}</span>
                   {item.badge !== undefined && (
                     <span
                       className={[
@@ -126,10 +124,10 @@ export default function PageShell({
             })}
           </nav>
 
-          {/* Mobile Bottom Bookmark Bar */}
+          {/* Mobile Bottom Bookmark Bar (< lg: reachable at 360px and 700px) */}
           <nav
             aria-label="Mobile Navigation"
-            className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF6EE] border-t border-[#E8C9B8] p-2 flex justify-around shadow-lg"
+            className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#FFF6EE] border-t border-[#E8C9B8] p-2 flex justify-around shadow-lg"
           >
             {nav.map((item) => {
               const active =
@@ -151,19 +149,26 @@ export default function PageShell({
             })}
           </nav>
 
-          {/* Left Page (Desktop 38% width with right-side spine gutter) */}
+          {/* Left Page (Desktop 38% width; on mobile shows only on Home /) */}
           {leftPage ? (
-            <div className="w-full md:w-[38%] border-b md:border-b-0 md:border-r border-[#E8C9B8] shadow-[inset_-16px_0_24px_-14px_rgba(58,31,20,0.16)] flex flex-col p-5 sm:p-7 ruled-paper">
+            <div
+              className={[
+                "w-full lg:w-[38%]",
+                isHome ? "flex" : "hidden lg:flex",
+                "border-b lg:border-b-0 lg:border-r border-[#E8C9B8] shadow-[inset_-16px_0_24px_-14px_rgba(58,31,20,0.16)] flex-col p-5 sm:p-7 ruled-paper",
+              ].join(" ")}
+            >
               {leftPage}
             </div>
           ) : null}
 
-          {/* Right Page (or Full Width on single page view) */}
+          {/* Right Page (on mobile hidden on Home /, shown on push routes with back button) */}
           <div
             className={[
-              "flex-1 flex flex-col p-5 sm:p-7 ruled-paper",
+              "flex-1 flex-col p-5 sm:p-7 ruled-paper",
+              isHome ? "hidden lg:flex" : "flex",
               leftPage
-                ? "md:w-[62%] shadow-[inset_16px_0_24px_-14px_rgba(58,31,20,0.16)]"
+                ? "lg:w-[62%] shadow-[inset_16px_0_24px_-14px_rgba(58,31,20,0.16)]"
                 : "",
             ].join(" ")}
           >

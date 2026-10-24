@@ -85,9 +85,10 @@ contract Tab {
     error ForgiveTooMuch(uint256 owed, uint256 requested);
     error NothingToWithdraw();
     error TransferFailed();
+    error Reentrancy();
 
     modifier nonReentrant() {
-        require(!_locked, "REENTRANT");
+        if (_locked) revert Reentrancy();
         _locked = true;
         _;
         _locked = false;

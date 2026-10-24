@@ -12,13 +12,8 @@ export default function Home() {
       subtitle="Bilateral ledger on BOT Chain"
     >
       <div className="flex flex-col gap-6 justify-between h-full font-mono">
-        {/* On mobile: LedgerLeftPage is shown above or here */}
-        <div className="md:hidden">
-          <LedgerLeftPage />
-        </div>
-
         {/* Desktop Right Page Content */}
-        <div className="hidden md:flex flex-col gap-6">
+        <div className="flex flex-col gap-6">
           <div className="border-b border-[#E8C9B8] pb-4">
             <span className="text-xs uppercase text-[#7A5646] tracking-widest block mb-1">
               ACCOUNTING FOLIO

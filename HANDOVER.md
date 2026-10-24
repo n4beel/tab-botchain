@@ -71,3 +71,40 @@ python3 ../scripts/check-distinct.py tab
 - Debt balances cannot cross zero on settlement: paying more than owed reverts `BadPayment`.
 - Netting is strictly pairwise; multi-party circular settlements require mutual individual pairwise settlement.
 - A proposal does not alter state until confirmed by the counterparty.
+
+## Feedback round 1
+
+All 5 items from `docs/specs/FEEDBACK-tab.md` have been fixed and verified.
+
+### Item Status
+
+1. **Duplicated page on narrow widths:** **FIXED.** Updated `components/layout/PageShell.tsx` and `app/page.tsx` so that viewports below `lg` (1024px) render a single page layout: `/` renders only the General Ledger page with bottom bookmarks bar, while push subroutes (`/with/[address]`, `/waiting`, `/new`) render only the folio view with a clear `← Ledger` back affordance. At desktop widths (`lg:` and `>= 1100px`), the physical two-page bound folio spread (38% ledger / 62% folio) is active with right-edge tabs. Tested at 360px, 700px, and 1100px with zero content duplication.
+2. **Decode creation event by name:** **FIXED.** In `components/tab/NewEntryForm.tsx`, replaced raw `topics[1]` indexing with `parseEventLogs({ abi: tabAbi, logs: receipt.logs, eventName: "Proposed" })` and extracted `parsed[0]?.args?.id`.
+3. **Local stack does not point app at seeded chain & timestamp alignment:** **FIXED.** Updated `scripts/local-stack.mjs` to write `NEXT_PUBLIC_BOTCHAIN_NETWORK=testnet` and `NEXT_PUBLIC_BOHR_RPC=http://127.0.0.1:8709` into `.env.local`. Started anvil with `--timestamp (realNow - 60)` and asserted final chain timestamp is within 120s of wall clock time (measured 60s diff). Added formatted Account Role Table output matching spec §5.
+4. **`require(..., "REENTRANT")` string revert:** **FIXED.** Replaced `require(!_locked, "REENTRANT");` in `contracts/src/Tab.sol:90` with `if (_locked) revert Reentrancy();`. Added `error Reentrancy();` to contract, `lib/botchain/abi.ts` (as ABI error), and `lib/errors.ts` ("Reentrant call detected."). Added `ReentrantWithdrawer` attack contract and `test_Reentrancy_RevertsWithCustomError` in `contracts/test/Tab.t.sol` and test in `lib/__tests__/errors.test.ts`. Zero string reverts remain.
+5. **Browser walkthrough required before hand-over:** **FIXED.** Executed automated browser walkthrough using Puppeteer and `docs/specs/tools/mock-wallet.js` against the local stack on port 8709 and dev server on port 3009. Verified all routes, viewports, and roles with zero console errors and zero hydration warnings.
+
+### Browser Walkthrough Results
+
+| Route | Role | Viewport / Action | Observation | Status |
+|---|---|---|---|---|
+| `/` | Visitor | 360px | Single page ledger, zero duplicated content, bottom bookmarks reachable | PASS |
+| `/` | Visitor | 700px | Single page ledger, zero duplicated content, bottom bookmarks reachable | PASS |
+| `/` | Visitor | 1100px | Desktop two-page spread (38% left ledger, 62% right folio), right-edge tabs active | PASS |
+| `/` | Acc 0 (Creditor) | 1100px / Write | Connected Acc 0; net balance displayed (owed 0.75 BOT); collected 2.7 BOT pending vault funds | PASS |
+| `/with/[address]` | Acc 0 & Acc 1 | 700px & 1100px / Writes | 700px back affordance `← Ledger` verified; statement verified; Forgive 0.1 BOT by Acc 0 and Settle 0.25 BOT by Acc 1 both confirmed | PASS |
+| `/waiting` | Acc 0 | 1100px / Write | Displayed incoming proposal from Acc 2 ("Drinks after work", 0.35 BOT) and confirmed on-chain | PASS |
+| `/new` | Acc 0 | 1100px / Write | Proposed 0.1 BOT to Acc 3 with note "Weekend trip supplies"; decoded `Proposed` event and showed confirmed proposal card | PASS |
+
+- **Console Errors:** 0
+- **Hydration Warnings:** 0
+
+### Verification Gate Summary
+
+- `forge test`: 17 passed; 0 failed; 0 skipped; 256 fuzz runs; 128,000 invariant calls; 0 string reverts.
+- `npm run typecheck`: clean (0 errors).
+- `npm test`: 66 passed (10 test files), hook-deps passed.
+- `npm run test:integration`: 17 passed (2 test files).
+- `npm run build`: compiled successfully.
+- `python3 scripts/check-distinct.py tab`: 30 projects compared, 0 problems.
+- `git status`: clean.

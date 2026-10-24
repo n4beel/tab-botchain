@@ -100,4 +100,9 @@ describe("describeError", () => {
     const err = { data: { errorName: "TransferFailed", args: [] } };
     expect(describeError(err)).toBe("BOT transfer failed.");
   });
+
+  it("translates Reentrancy", () => {
+    const err = { data: { errorName: "Reentrancy", args: [] } };
+    expect(describeError(err)).toBe("Reentrant call detected.");
+  });
 });

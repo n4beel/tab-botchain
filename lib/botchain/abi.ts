@@ -700,5 +700,10 @@ export const tabAbi = [
     "type": "error",
     "name": "ZeroAmount",
     "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "Reentrancy",
+    "inputs": []
   }
 ] as const;
