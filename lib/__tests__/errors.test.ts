@@ -29,17 +29,17 @@ describe("describeError", () => {
 
   it("translates BadParty", () => {
     const err = { data: { errorName: "BadParty", args: [] } };
-    expect(describeError(err)).toBe("Cannot create a tab entry with yourself or the zero address.");
+    expect(describeError(err)).toBe("Choose someone other than yourself.");
   });
 
   it("translates ZeroAmount", () => {
     const err = { data: { errorName: "ZeroAmount", args: [] } };
-    expect(describeError(err)).toBe("Amount must be greater than zero.");
+    expect(describeError(err)).toBe("An entry needs an amount.");
   });
 
   it("translates NoteTooLong", () => {
     const err = { data: { errorName: "NoteTooLong", args: [145n, 140n] } };
-    expect(describeError(err)).toBe("Note is 145 bytes; limit is 140 bytes.");
+    expect(describeError(err)).toBe("Notes run to 140 bytes; yours is 145.");
   });
 
   it("translates NoSuchProposal", () => {
@@ -48,8 +48,8 @@ describe("describeError", () => {
   });
 
   it("translates NotCounterparty", () => {
-    const err = { data: { errorName: "NotCounterparty", args: [1n, "0x123"] } };
-    expect(describeError(err)).toBe("Only the counterparty can confirm or reject this entry.");
+    const err = { data: { errorName: "NotCounterparty", args: [1n, "0x1234567890abcdef1234567890abcdef12345678"] } };
+    expect(describeError(err)).toBe("Only 0x1234…5678 can answer this entry.");
   });
 
   it("translates NotProposer", () => {
@@ -59,12 +59,12 @@ describe("describeError", () => {
 
   it("translates NotPending", () => {
     const err = { data: { errorName: "NotPending", args: [1n, 1] } };
-    expect(describeError(err)).toBe("This entry proposal has already been decided.");
+    expect(describeError(err)).toBe("This entry has already been confirmed.");
   });
 
   it("translates NothingOwed", () => {
     const err = { data: { errorName: "NothingOwed", args: ["0xAlice", "0xBob"] } };
-    expect(describeError(err)).toBe("No balance is owed to this counterparty.");
+    expect(describeError(err)).toBe("There's nothing owed in that direction.");
   });
 
   it("translates BadPayment overpayment", () => {
@@ -75,7 +75,7 @@ describe("describeError", () => {
       },
     };
     expect(describeError(err)).toBe(
-      "Payment of 2 BOT exceeds the balance owed (1 BOT)."
+      "You owe 1 BOT; you tried to pay 2 BOT."
     );
   });
 
@@ -87,13 +87,13 @@ describe("describeError", () => {
       },
     };
     expect(describeError(err)).toBe(
-      "Cannot forgive 3 BOT; only 1 BOT is owed."
+      "They only owe 1 BOT. You can forgive up to that."
     );
   });
 
   it("translates NothingToWithdraw", () => {
     const err = { data: { errorName: "NothingToWithdraw", args: [] } };
-    expect(describeError(err)).toBe("No settled funds waiting to be collected.");
+    expect(describeError(err)).toBe("Nothing to collect.");
   });
 
   it("translates TransferFailed", () => {
