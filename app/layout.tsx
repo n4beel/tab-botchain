@@ -22,6 +22,7 @@ const courierPrime = Courier_Prime({
 export const metadata: Metadata = {
   title: `${app.name} — ${app.tagline}`,
   description: app.tagline,
+  icons: { icon: "/icon.png" },
   openGraph: { title: app.name, description: app.tagline, type: "website", url: app.url },
 };
 
