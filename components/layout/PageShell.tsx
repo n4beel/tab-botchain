@@ -8,6 +8,7 @@ import NetworkBadge from "@/components/botchain/NetworkBadge";
 import BuiltOnBotChain from "@/components/botchain/BuiltOnBotChain";
 import { BOOKMARK_TABS, NavItem } from "@/lib/nav";
 import { app } from "@/lib/app-config";
+import { footerLinks } from "@/lib/botchain/chain";
 
 export interface PageShellProps {
   children: ReactNode;
@@ -42,6 +43,7 @@ export default function PageShell({
   const pathname = usePathname();
   const isHome = pathname === "/";
   const sub = subtitle || description;
+  const { site, explorer } = footerLinks();
 
   return (
     <div className="min-h-[100dvh] bg-[#FFE3D3] text-[#3A1F14] flex flex-col justify-between p-3 sm:p-6 lg:p-8 lg:pr-14 pb-16 lg:pb-8">
@@ -206,7 +208,27 @@ export default function PageShell({
         <div>
           <span>Tab · {app.tagline}</span>
         </div>
-        <BuiltOnBotChain />
+        <div className="flex flex-wrap items-center gap-3">
+          <BuiltOnBotChain className="hover:underline" />
+          <span className="text-[#E8C9B8]" aria-hidden="true">•</span>
+          <a
+            href={site}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:underline hover:text-[#3A1F14]"
+          >
+            botchain.ai
+          </a>
+          <span className="text-[#E8C9B8]" aria-hidden="true">•</span>
+          <a
+            href={explorer}
+            target="_blank"
+            rel="noreferrer"
+            className="hover:underline hover:text-[#3A1F14]"
+          >
+            Explorer
+          </a>
+        </div>
       </footer>
     </div>
   );
