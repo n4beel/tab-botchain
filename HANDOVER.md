@@ -138,4 +138,25 @@ All 5 items from `docs/specs/FEEDBACK-tab.md` have been fixed and verified.
   - `/with/0x70997970c51812dc3a010c7d01b50e0d17dc79c8` (Detail): Verified all three links present.
   - `/nonexistent` (Not Found): Verified all three links present.
 
+## Feedback round 4
+
+- **Item 1 (Shared CSS Tokens & Contrast):**
+  - Defined missing tokens in `app/globals.css`:
+    - `--border-default: #E8C9B8`
+    - `--text-secondary: #5C3A2D` (9.54:1 contrast on `--bg-elevated: #FFF9F4`, WCAG AAA)
+    - `--text-tertiary: #755042` (6.62:1 contrast on `--bg-elevated`, WCAG AA)
+    - `--success: #1E6B3A` (6.18:1 contrast on `--bg-elevated`, WCAG AA)
+    - `--danger: #A82215` (5.75:1 contrast on `--bg-elevated`, WCAG AA)
+    - `--warning: #8A4A00` (6.80:1 contrast on `--bg-elevated`, WCAG AA)
+  - Updated `ConnectButton.tsx` menu items with readable text, surface colors, and hover highlight (`hover:bg-[rgba(58,31,20,0.06)]`).
+  - Added unit test `test/lint/tokens.test.ts`.
+  - Verified `python3 scripts/check-tokens.py tab` exits 0 with zero undefined tokens.
+
+- **Item 6 (Ruled-Paper Visual Simplification):**
+  - Removed full-viewport `ruled-paper` repeating lines from `PageShell.tsx` on both left and right folio pages, keeping a calm, solid paper surface (`#FFF6EE`).
+  - Restricted ruled lines strictly to the counterparty list in `components/tab/LedgerLeftPage.tsx` using `.ruled-ledger-rows`, precisely aligned to the 36px ledger entry height.
+  - Reduced rule line contrast (`rgba(232, 201, 184, 0.45)`) so guidelines never compete with typography.
+  - Verified no ruled line crosses any heading, card, form input, or button at 360px, 700px, or 1280px viewports.
+
+
 

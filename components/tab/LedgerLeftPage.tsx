@@ -163,11 +163,11 @@ export default function LedgerLeftPage({ selectedPeer }: LedgerLeftPageProps) {
           </div>
 
           {peers.length === 0 ? (
-            <div className="py-6 text-center text-xs text-[#7A5646] font-mono">
+            <div className="py-6 text-center text-xs text-[#7A5646] font-mono border border-[#E8C9B8]/40 rounded-[2px]">
               {isConnected ? "NO ACCOUNTS RECORDED." : "CONNECT WALLET TO VIEW ACCOUNTS."}
             </div>
           ) : (
-            <ul className="flex flex-col gap-1.5" role="list">
+            <ul className="flex flex-col ruled-ledger-rows border border-[#E8C9B8]/40 rounded-[2px]" role="list">
               {peers.map((peer, idx) => {
                 const bal = balances[idx] ?? 0n;
                 const { formatted, isNegative } = formatSigned(bal);
@@ -175,14 +175,14 @@ export default function LedgerLeftPage({ selectedPeer }: LedgerLeftPageProps) {
                   selectedPeer && selectedPeer.toLowerCase() === peer.toLowerCase();
 
                 return (
-                  <li key={peer}>
+                  <li key={peer} className="h-[36px] flex items-center">
                     <Link
                       href={`/with/${peer}`}
                       className={[
-                        "flex items-center justify-between py-1.5 px-2 rounded-[2px] text-xs font-mono no-underline transition-colors",
+                        "w-full h-full flex items-center justify-between px-2.5 text-xs font-mono no-underline transition-colors",
                         isCurrent
                           ? "bg-[#FFE3D3] font-bold text-[#3A1F14]"
-                          : "hover:bg-[#FFF9F4] text-[#3A1F14]",
+                          : "hover:bg-[#FFF9F4]/75 text-[#3A1F14]",
                       ].join(" ")}
                     >
                       <span className="shrink-0">{shortAddress(peer)}</span>

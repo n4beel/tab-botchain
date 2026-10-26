@@ -25,12 +25,18 @@
   --bg-surface: #FFF6EE;
   --bg-elevated: #FFF9F4;
   --text-primary: #3A1F14;
+  --text-secondary: #5C3A2D;
+  --text-tertiary: #755042;
   --text-muted: #7A5646;
   --border-subtle: #E8C9B8;
+  --border-default: #E8C9B8;
   --border-strong: #3A1F14;
   --accent: #B8371F;
   --accent-ink: #FFFFFF;
   --ink-blue: #1E3A6B;
+  --success: #1E6B3A;
+  --danger: #A82215;
+  --warning: #8A4A00;
 
   --ledger-shadow: 0 4px 20px rgba(58, 31, 20, 0.12);
   --spine-shadow: inset 18px 0 24px -14px rgba(58, 31, 20, 0.22), inset -18px 0 24px -14px rgba(58, 31, 20, 0.22);
@@ -52,18 +58,22 @@
     min-height: 100%;
   }
 
-  /* Ruled paper lines across ledger viewports */
-  .ruled-paper {
+  /* Ruled lines restricted strictly to left page ledger rows */
+  .ruled-ledger-rows {
     background-color: var(--bg-surface);
     background-image: repeating-linear-gradient(
       to bottom,
       transparent,
-      transparent 27px,
-      var(--border-subtle) 27px,
-      var(--border-subtle) 28px
+      transparent 35px,
+      rgba(232, 201, 184, 0.45) 35px,
+      rgba(232, 201, 184, 0.45) 36px
     );
-    background-size: 100% 28px;
-    line-height: 28px;
+    background-size: 100% 36px;
+  }
+
+  /* Plain paper surface without cross-cutting lines */
+  .ruled-paper {
+    background-color: var(--bg-surface);
   }
 
   /* Red vertical margin rule */

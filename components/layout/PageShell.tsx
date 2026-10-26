@@ -157,7 +157,7 @@ export default function PageShell({
               className={[
                 "w-full lg:w-[38%]",
                 isHome ? "flex" : "hidden lg:flex",
-                "border-b lg:border-b-0 lg:border-r border-[#E8C9B8] shadow-[inset_-16px_0_24px_-14px_rgba(58,31,20,0.16)] flex-col p-5 sm:p-7 ruled-paper",
+                "border-b lg:border-b-0 lg:border-r border-[#E8C9B8] shadow-[inset_-16px_0_24px_-14px_rgba(58,31,20,0.16)] flex-col p-5 sm:p-7 bg-[#FFF6EE]",
               ].join(" ")}
             >
               {leftPage}
@@ -167,7 +167,7 @@ export default function PageShell({
           {/* Right Page (on mobile hidden on Home /, shown on push routes with back button) */}
           <div
             className={[
-              "flex-1 flex-col p-5 sm:p-7 ruled-paper",
+              "flex-1 flex-col p-5 sm:p-7 bg-[#FFF6EE]",
               isHome ? "hidden lg:flex" : "flex",
               leftPage
                 ? "lg:w-[62%] shadow-[inset_16px_0_24px_-14px_rgba(58,31,20,0.16)]"
